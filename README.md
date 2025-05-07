@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Poker Game with Hand Evaluation
 
 
@@ -79,3 +80,6 @@ CardTypes.pas: Defines the card suits, ranks, and the deck structure. Also inclu
 PokerHandEvaluator.pas: Contains the logic to evaluate the strength of a hand based on the cards dealt to the player and the community cards.
 
 GameForm.pas: Handles the game flow, including dealing cards, displaying the UI, and calculating the winner.
+=======
+# DelphiPoker1on1
+>>>>>>> fb65d41691bc26dc7768aa2dd6f5bcf9e17b556d
