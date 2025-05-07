@@ -1,0 +1,534 @@
+unit Unit2;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, CardTypes, PokerHandEvaluator,
+  Vcl.ComCtrls, Vcl.Imaging.pngimage, Vcl.ExtCtrls, Vcl.Buttons;
+
+type
+  TGameForm = class(TForm)
+    btnBack: TButton;
+    lblCoins: TLabel;
+    sliderBet: TTrackBar;
+    lblBet: TLabel;
+    lblcard1: TLabel;
+    lblcard2: TLabel;
+    lblcard3: TLabel;
+    lblcard4: TLabel;
+    lblcard5: TLabel;
+    lblBotCard1: TLabel;
+    lblBotCard2: TLabel;
+    PotLabel: TLabel;
+    MainPanel: TPanel;
+    Image1: TImage;
+    PlayerCardImage1: TImage;
+    Card1: TPanel;
+    Card2: TPanel;
+    PlayerCardImage2: TImage;
+    MiddleCards1: TPanel;
+    MiddleCardImage1: TImage;
+    MiddleCards2: TPanel;
+    MiddleCardImage2: TImage;
+    MiddleCards3: TPanel;
+    MiddleCardImage3: TImage;
+    BotCards1: TPanel;
+    BotCardImage1: TImage;
+    BotCards2: TPanel;
+    BotCardImage2: TImage;
+    btnBet: TPanel;
+    BotCardHide1: TPanel;
+    Image2: TImage;
+    Label1: TLabel;
+    BotCardHide2: TPanel;
+    Image3: TImage;
+    Label2: TLabel;
+    btnFold: TButton;
+    procedure btnBackClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure btnBet1Click(Sender: TObject);
+    procedure sliderBetChange(Sender: TObject);
+    procedure DealPlayerCards;
+    procedure DealMiddleCards;
+    procedure GetScore;
+    function GetCardImagePath(Card: TCard): string;
+    function GetCardDisplay(Card: TCard): string;
+    procedure btnBetClick(Sender: TObject);
+    procedure btnFoldClick(Sender: TObject);
+  private
+    Deck: TDeck;
+    PlayerCard1, PlayerCard2: TCard;
+    BotCard1, BotCard2: TCard;
+    MiddleCard1, MiddleCard2, MiddleCard3: TCard;
+    Coins: Integer;
+    Pot: Integer;
+    PlayerHasCards: Boolean;
+    MiddleHasCards: Boolean;
+    AllIn: Boolean;
+    CommunityCards: TArray<TCard>;
+    BotScore: Single;
+    PlayerScore: Single;
+  public
+    { Public declarations }
+  end;
+
+var
+  GameForm: TGameForm;
+
+implementation
+
+uses Unit1;
+
+{$R *.dfm}
+
+procedure TGameForm.btnBackClick(Sender: TObject);
+begin
+  GameForm.Hide;
+  MainMenuForm.Show;
+end;
+
+procedure TGameForm.FormCreate(Sender: TObject);
+var
+  I: Integer;
+  CardStr: string;
+  rgn: HRGN;
+
+
+
+  // Helper function to convert Suit to string
+  function SuitToString(Suit: TCardSuit): string;
+  begin
+    case Suit of
+      Hearts: Result := 'Hearts';
+      Diamonds: Result := 'Diamonds';
+      Clubs: Result := 'Clubs';
+      Spades: Result := 'Spades';
+    else
+      Result := 'Unknown';
+    end;
+  end;
+
+  // Helper function to convert Rank to string
+  function RankToString(Rank: TCardRank): string;
+  begin
+    case Rank of
+      Two: Result := '2';
+      Three: Result := '3';
+      Four: Result := '4';
+      Five: Result := '5';
+      Six: Result := '6';
+      Seven: Result := '7';
+      Eight: Result := '8';
+      Nine: Result := '9';
+      Ten: Result := '10';
+      Jack: Result := 'Jack';
+      Queen: Result := 'Queen';
+      King: Result := 'King';
+      Ace: Result := 'Ace';
+    else
+      Result := 'Unknown';
+    end;
+  end;
+
+  begin
+    // Create a circular region matching the size of Panel1
+    Rgn := CreateEllipticRgn(0, 0, btnBet.Width, btnBet.Height);
+    // Apply the region to the panel
+    SetWindowRgn(btnBet.Handle, Rgn, True);
+    InitDeck(Deck);
+    ShuffleDeck(Deck);
+
+      Coins := 100;  // Starting coins for the player
+
+    // Create and setup the TrackBar (Slider) dynamically if needed
+    sliderBet.Min := 1;
+    sliderBet.Max := Coins;
+    sliderBet.Position := 1;  // Starting bet is 1 coin
+    sliderBet.OnChange := sliderBetChange;  // Event to handle slider change
+
+    // Loop to print all the cards to the debug log
+    for I := 0 to Length(Deck) - 1 do
+    begin
+      CardStr := 'Card ' + IntToStr(I + 1) + ': ' + RankToString(Deck[I].Rank) + ' of ' + SuitToString(Deck[I].Suit);
+      OutputDebugString(PChar(CardStr)); // Prints the card to the debug log
+    end;
+  end;
+
+procedure TGameForm.btnBet1Click(Sender: TObject);
+var
+  BetAmount: Integer;
+begin
+  // Get the selected bet amount from the slider
+  BetAmount := sliderBet.Position;
+
+  // Validate the bet (must be less than or equal to coins available)
+  if BetAmount <= 0 then
+  begin
+    ShowMessage('Bet amount must be greater than 0.');
+    Exit;
+  end;
+
+  if BetAmount > Coins then
+  begin
+    ShowMessage('Not enough coins.');
+    Exit;
+  end;
+
+  // Deduct bet from the player's coins and add it to the pot
+  Coins := Coins - BetAmount;
+  Pot := Pot + BetAmount * 2;
+
+  PotLabel.Caption := 'Pot: ' + Pot.ToString;
+
+  // Update labels
+  lblCoins.Caption := 'Coins: ' + Coins.ToString;
+  lblBet.Caption := 'Bet: ' + BetAmount.ToString;
+  sliderBet.Max := Coins;
+
+  // Optionally, print the Pot value
+  ShowMessage('Bet placed! Coins: ' + Coins.ToString);
+
+  if Coins < 1 then
+  begin
+    AllIn := true;
+    ShowMessage('All In is true ');
+  end;
+
+if PlayerHasCards = false and AllIn = false then
+begin
+  DealPlayerCards;
+  Exit;
+end;
+if MiddleHasCards = false and AllIn = false then
+begin
+  DealMiddleCards;
+  Exit;
+end;
+
+if AllIn = true then
+begin
+ DealPlayerCards;
+ DealMiddleCards;
+end;
+
+GetScore;
+
+if PlayerScore > BotScore then
+begin
+  ShowMessage('Win:' + Pot.ToString + ' Coins');
+  Coins := Coins + Pot;
+  lblCoins.Caption := 'Coins: ' + Coins.ToString;
+  sliderBet.Max := Coins;
+  Pot := 0;
+  PotLabel.Caption := 'Pot:';
+end;
+if BotScore > PlayerScore then
+begin
+  ShowMessage('Lose');
+  Pot := 0;
+  PotLabel.Caption := 'Pot:';
+end;
+if BotScore = PlayerScore then
+begin
+  ShowMessage('Tie');
+  Coins := Coins + (Pot div 2);
+  lblCoins.Caption := 'Coins: ' + Coins.ToString;
+  sliderBet.Max := Coins;
+  Pot := 0;
+  PotLabel.Caption := 'Pot:';
+end;
+
+InitDeck(Deck);
+ShuffleDeck(Deck);
+
+PlayerHasCards := false;
+MiddleHasCards := false;
+
+lblCard1.Caption := ('');
+lblCard2.Caption := ('');
+
+lblBotCard1.Caption := ('');
+lblBotCard2.Caption := ('');
+
+lblCard3.Caption := ('');
+lblCard4.Caption := ('');
+lblCard5.Caption := ('');
+
+
+end;
+
+procedure TGameForm.btnBetClick(Sender: TObject);
+var
+  BetAmount: Integer;
+begin
+  // Get the selected bet amount from the slider
+  BetAmount := sliderBet.Position;
+
+  AllIn := false;
+
+  // Validate the bet (must be less than or equal to coins available)
+  if BetAmount <= 0 then
+  begin
+    ShowMessage('Bet amount must be greater than 0.');
+    Exit;
+  end;
+
+  if BetAmount > Coins then
+  begin
+    ShowMessage('Not enough coins.');
+    Exit;
+  end;
+
+  // Deduct bet from the player's coins and add it to the pot
+  Coins := Coins - BetAmount;
+  Pot := Pot + BetAmount * 2;
+
+  PotLabel.Caption := 'Pot: ' + Pot.ToString;
+
+  // Update labels
+  lblCoins.Caption := 'Coins: ' + Coins.ToString;
+  lblBet.Caption := 'Bet: ' + BetAmount.ToString;
+  sliderBet.Max := Coins;
+
+    // Optionally, print the Pot value
+  ShowMessage('Bet placed! Coins: ' + Coins.ToString);
+
+  if Coins < 1 then
+  begin
+    AllIn := true;
+    ShowMessage('All In is true ');
+  end;
+
+if PlayerHasCards = false then
+begin
+  DealPlayerCards;
+  Exit;
+end;
+if MiddleHasCards = false and AllIn = false then
+begin
+  DealMiddleCards;
+  Exit;
+end;
+
+if AllIn = true then
+begin
+ DealPlayerCards;
+ DealMiddleCards;
+end;
+GetScore;
+
+if PlayerScore > BotScore then
+begin
+  BotCardHide1.visible := false;
+  BotCardHide2.visible := false;
+  ShowMessage('Win:' + Pot.ToString + ' Coins');
+  Coins := Coins + Pot;
+  lblCoins.Caption := 'Coins: ' + Coins.ToString;
+  sliderBet.Max := Coins;
+  Pot := 0;
+  PotLabel.Caption := 'Pot:';
+end;
+if BotScore > PlayerScore then
+begin
+  BotCardHide1.visible := false;
+  BotCardHide2.visible := false;
+  ShowMessage('Lose');
+  Pot := 0;
+  PotLabel.Caption := 'Pot:';
+end;
+if BotScore = PlayerScore then
+begin
+  BotCardHide1.visible := false;
+  BotCardHide2.visible := false;
+  ShowMessage('Tie');
+  Coins := Coins + (Pot div 2);
+  lblCoins.Caption := 'Coins: ' + Coins.ToString;
+  sliderBet.Max := Coins;
+  Pot := 0;
+  PotLabel.Caption := 'Pot:';
+end;
+
+InitDeck(Deck);
+ShuffleDeck(Deck);
+
+PlayerHasCards := false;
+MiddleHasCards := false;
+
+lblCard1.Caption := ('');
+lblCard2.Caption := ('');
+
+lblBotCard1.Caption := ('');
+lblBotCard2.Caption := ('');
+
+lblCard3.Caption := ('');
+lblCard4.Caption := ('');
+lblCard5.Caption := ('');
+
+btnFold.visible := false
+
+end;
+
+procedure TGameForm.btnFoldClick(Sender: TObject);
+begin
+
+  BotCardHide1.visible := false;
+  BotCardHide2.visible := false;
+  ShowMessage('Lose');
+  Pot := 0;
+  PotLabel.Caption := 'Pot:';
+
+  InitDeck(Deck);
+  ShuffleDeck(Deck);
+
+  PlayerHasCards := false;
+  MiddleHasCards := false;
+
+  lblCard1.Caption := ('');
+  lblCard2.Caption := ('');
+
+  lblBotCard1.Caption := ('');
+  lblBotCard2.Caption := ('');
+
+  lblCard3.Caption := ('');
+  lblCard4.Caption := ('');
+  lblCard5.Caption := ('');
+
+  btnFold.visible := false
+
+end;
+
+procedure TGameForm.sliderBetChange(Sender: TObject);
+begin
+  // Update the bet label whenever the slider value changes
+  lblBet.Caption := 'Bet: ' + sliderBet.Position.ToString;
+end;
+
+
+
+
+//Give Cardss graphic
+
+
+function TGameForm.GetCardDisplay(Card: TCard): string;
+const
+  SuitNames: array[TCardSuit] of string = ('Hearts', 'Diamonds', 'Clubs', 'Spades');
+  RankNames: array[TCardRank] of string = (
+     '2', '3', '4', '5', '6', '7', '8', '9', '10',
+    'Jack', 'Queen', 'King', 'Ace'
+  );
+begin
+  Result := RankNames[Card.Rank] + ' of ' + SuitNames[Card.Suit];
+end;
+
+//Give cards to player
+
+
+procedure TGameForm.DealPlayerCards;
+begin
+  if Length(Deck) < 4 then
+  begin
+    ShowMessage('Not enough cards left in the deck!');
+    Exit;
+  end;
+
+  btnFold.visible := true;
+
+  PlayerCard1 := Deck[0];
+  Card1.visible := true;
+  PlayerCardImage1.Picture.LoadFromFile(GetCardImagePath(PlayerCard1));
+  PlayerCard2 := Deck[1];
+  Card2.visible := true;
+  PlayerCardImage2.Picture.LoadFromFile(GetCardImagePath(PlayerCard2));
+
+  BotCardHide1.visible := true;
+  BotCardHide2.visible := true;
+
+  BotCard1 := Deck[2];
+  BotCards1.visible := true;
+  BotCardImage1.Picture.LoadFromFile(GetCardImagePath(BotCard1));
+  BotCard2 := Deck[3];
+  BotCards2.visible := true;
+  BotCardImage2.Picture.LoadFromFile(GetCardImagePath(BotCard2));
+
+  Delete(Deck, 0, 4);
+
+  PlayerHasCards := true;
+
+  // Example with labels:
+  lblCard1.Caption := GetCardDisplay(PlayerCard1);
+  lblCard2.Caption := GetCardDisplay(PlayerCard2);
+
+  lblBotCard1.Caption := GetCardDisplay(BotCard1);
+  lblBotCard2.Caption := GetCardDisplay(BotCard2);
+end;
+
+
+
+//Put Cards in the middle
+procedure TGameForm.DealMiddleCards;
+begin
+  if Length(Deck) < 2 then
+  begin
+    ShowMessage('Not enough cards left in the deck!');
+    Exit;
+  end;
+
+  MiddleCard1 := Deck[0];
+  MiddleCard2 := Deck[1];
+  MiddleCard3 := Deck[2];
+
+  MiddleCards1.visible := true;
+  MiddleCardImage1.Picture.LoadFromFile(GetCardImagePath(MiddleCard1));
+
+  MiddleCards2.visible := true;
+  MiddleCardImage2.Picture.LoadFromFile(GetCardImagePath(MiddleCard2));
+
+  MiddleCards3.visible := true;
+  MiddleCardImage3.Picture.LoadFromFile(GetCardImagePath(MiddleCard3));
+
+
+  Delete(Deck, 0, 3);
+
+    // Set the CommunityCards array
+  SetLength(CommunityCards, 3);
+  CommunityCards[0] := MiddleCard1;
+  CommunityCards[1] := MiddleCard2;
+  CommunityCards[2] := MiddleCard3;
+
+  // Example with labels:
+  lblCard3.Caption := GetCardDisplay(MiddleCard1);
+  lblCard4.Caption := GetCardDisplay(MiddleCard2);
+  lblCard5.Caption := GetCardDisplay(MiddleCard3);
+
+  MiddleHasCards := true;
+end;
+
+
+procedure TGameForm.GetScore;
+var
+  Evaluator: TPokerHandEvaluator;
+begin
+  Evaluator := TPokerHandEvaluator.Create;
+  try
+    PlayerScore := Evaluator.GetHandScore(PlayerCard1, PlayerCard2, CommunityCards);
+    BotScore := Evaluator.GetHandScore(BotCard1, BotCard2, CommunityCards);
+    ShowMessage('Hand Score: ' + PlayerScore.ToString + ' Bot Score:' + BotScore.ToString);
+  finally
+    Evaluator.Free;
+  end;
+end;
+
+function TGameForm.GetCardImagePath(Card: TCard): string;
+const
+  SuitNames: array[TCardSuit] of string = ('hearts', 'diamonds', 'clubs', 'spades');
+  RankNames: array[TCardRank] of string = (
+    '02', '03', '04', '05', '06', '07', '08', '09', '10',
+    'J', 'Q', 'K', 'A'
+  );
+begin
+  Result := 'Art\Cards\card_' + SuitNames[Card.Suit] + '_' + RankNames[Card.Rank] + '.png';
+end;
+
+end.
+

@@ -1,0 +1,43 @@
+unit Unit1;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
+  Unit2; // ? Moved to interface section so TGameForm is visible
+
+type
+  TMainMenuForm = class(TForm)
+    btnPlay: TButton;
+    btnQuit: TButton;
+    lblTitle: TLabel;
+    procedure btnPlayClick(Sender: TObject);
+    procedure btnQuitClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  MainMenuForm: TMainMenuForm;
+
+implementation
+
+{$R *.dfm}
+
+procedure TMainMenuForm.btnPlayClick(Sender: TObject);
+begin
+  Hide;
+  GameForm := TGameForm.Create(Self);
+  GameForm.Show;
+end;
+
+procedure TMainMenuForm.btnQuitClick(Sender: TObject);
+begin
+  Close;
+end;
+
+end.
+

@@ -1,0 +1,14 @@
+program PokerProject;
+
+uses
+  Vcl.Forms,
+  Unit1 in 'Unit1.pas' {MainMenuForm};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TMainMenuForm, MainMenuForm);
+  Application.Run;
+end.

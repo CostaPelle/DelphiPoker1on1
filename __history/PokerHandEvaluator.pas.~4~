@@ -1,0 +1,126 @@
+unit PokerHandEvaluator;
+
+interface
+
+uses
+  System.SysUtils, System.Generics.Collections, CardTypes;
+
+type
+  TPokerHandEvaluator = class
+  public
+    function GetHandScore(Card1, Card2: TCard; Community: TArray<TCard>): Integer;
+  end;
+
+implementation
+
+function TPokerHandEvaluator.GetHandScore(Card1, Card2: TCard; Community: TArray<TCard>): Integer;
+var
+  AllCards: TArray<TCard>;
+  i: Integer;
+  Values: TList<Integer>;
+  Suits: TList<TCardSuit>;
+  ValueCounts: TDictionary<Integer, Integer>;
+  CountList: TList<Integer>;
+  IsFlush, IsStraight, IsRoyal: Boolean;
+  SortedValues: TArray<Integer>;
+begin
+  Result := 1; // Default to High Card
+
+  // Combine all cards
+  SetLength(AllCards, Length(Community) + 2);
+  AllCards[0] := Card1;
+  AllCards[1] := Card2;
+  for i := 0 to High(Community) do
+    AllCards[i + 2] := Community[i];
+
+  Values := TList<Integer>.Create;
+  Suits := TList<TCardSuit>.Create;
+  ValueCounts := TDictionary<Integer, Integer>.Create;
+  CountList := TList<Integer>.Create;
+
+  try
+    // Gather values and suits
+    for i := 0 to High(AllCards) do
+    begin
+      Values.Add(AllCards[i].Value);
+      Suits.Add(AllCards[i].Suit);
+
+      if not ValueCounts.ContainsKey(AllCards[i].Value) then
+        ValueCounts.Add(AllCards[i].Value, 1)
+      else
+        ValueCounts[AllCards[i].Value] := ValueCounts[AllCards[i].Value] + 1;
+    end;
+
+    // Sort values
+    SortedValues := Values.ToArray;
+    TArray.Sort<Integer>(SortedValues);
+
+    // Check for flush
+    IsFlush := True;
+    for i := 1 to Suits.Count - 1 do
+    begin
+      if Suits[i] <> Suits[0] then
+      begin
+        IsFlush := False;
+        Break;
+      end;
+    end;
+
+    // Check for straight
+    IsStraight := True;
+    for i := 0 to Length(SortedValues) - 2 do
+    begin
+      if SortedValues[i + 1] <> SortedValues[i] + 1 then
+      begin
+        IsStraight := False;
+        Break;
+      end;
+    end;
+
+    // Ace-low straight (A 2 3 4 5)
+    if not IsStraight and
+       (SortedValues[0] = 2) and (SortedValues[1] = 3) and
+       (SortedValues[2] = 4) and (SortedValues[3] = 5) and
+       (SortedValues[High(SortedValues)] = 14) then
+    begin
+      IsStraight := True;
+    end;
+
+    IsRoyal := IsFlush and IsStraight and (SortedValues[0] = 10);
+
+    // Count occurrences
+    for var Val in ValueCounts.Values do
+      CountList.Add(Val);
+    CountList.Sort;
+
+    // Score evaluation
+    if IsRoyal then
+      Result := 10
+    else if IsFlush and IsStraight then
+      Result := 9
+    else if CountList.Last = 4 then
+      Result := 8
+    else if (CountList.Contains(3)) and (CountList.Contains(2)) then
+      Result := 7
+    else if IsFlush then
+      Result := 6
+    else if IsStraight then
+      Result := 5
+    else if CountList.Last = 3 then
+      Result := 4
+    else if CountList.Count = 4 then
+      Result := 3 // Two Pair
+    else if CountList.Last = 2 then
+      Result := 2
+    else
+      Result := 1;
+
+  finally
+    Values.Free;
+    Suits.Free;
+    ValueCounts.Free;
+    CountList.Free;
+  end;
+end;
+
+end.

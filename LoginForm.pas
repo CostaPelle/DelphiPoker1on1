@@ -1,0 +1,75 @@
+unit LoginForm;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, FireDAC.Phys.PGDef, FireDAC.Stan.Intf,
+  FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
+  FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
+  FireDAC.Phys.PG, FireDAC.VCLUI.Wait, Data.DB, FireDAC.Comp.Client,
+  Vcl.StdCtrls, Vcl.Imaging.pngimage, Vcl.ExtCtrls, FireDAC.Stan.Param,
+  FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Comp.DataSet, Unit2;
+
+type
+  TForm5 = class(TForm)
+    FDPhysPgDriverLink1: TFDPhysPgDriverLink;
+    MainPanel: TPanel;
+    Image1: TImage;
+    btnLogin: TButton;
+    edtUsername: TEdit;
+    edtPassword: TEdit;
+    FDConnection1: TFDConnection;
+    FDQuery1: TFDQuery;
+    lblUsername: TLabel;
+    lblPassword: TLabel;
+    btnBack: TButton;
+    procedure btnLoginClick(Sender: TObject);
+    procedure btnBackClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form5: TForm5;
+
+implementation
+
+{$R *.dfm}
+
+uses Unit1;
+
+
+procedure TForm5.btnLoginClick(Sender: TObject);
+var
+  Username, Password, HashedPassword: string;
+begin
+  Username := edtUsername.Text;
+  Password := edtPassword.Text;
+  //HashedPassword := HashPassword(Password); // Use the same hash function used in signup
+
+  FDQuery1.SQL.Text :=
+    'SELECT * FROM users WHERE username = :username AND password_hash = :password';
+  FDQuery1.ParamByName('username').AsString := Username;
+  FDQuery1.ParamByName('password').AsString := Password;
+  FDQuery1.Open;
+
+  if not FDQuery1.IsEmpty then
+  begin
+    Form5.Hide;
+    GameForm := TGameForm.Create(Self);
+    GameForm.Show
+  end
+  else
+    ShowMessage('Invalid username or password.');
+end;
+
+procedure TForm5.btnBackClick(Sender: TObject);
+begin
+   Form5.Hide;
+   MainMenuForm.Show
+end;
+
+end.

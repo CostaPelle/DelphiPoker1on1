@@ -1,0 +1,39 @@
+object MainMenuForm: TMainMenuForm
+  Left = 0
+  Top = 0
+  Caption = 'Poker 1-on-1 - Main Menu'
+  ClientHeight = 780
+  ClientWidth = 1085
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -12
+  Font.Name = 'Segoe UI'
+  Font.Style = []
+  OnClick = btnQuitClick
+  TextHeight = 15
+  object lblTitle: TLabel
+    Left = 512
+    Top = 272
+    Width = 69
+    Height = 15
+    Caption = 'Poker 1-on-1'
+  end
+  object btnPlay: TButton
+    Left = 512
+    Top = 320
+    Width = 75
+    Height = 25
+    Caption = 'Play'
+    TabOrder = 0
+    OnClick = btnPlayClick
+  end
+  object btnQuit: TButton
+    Left = 512
+    Top = 376
+    Width = 75
+    Height = 25
+    Caption = 'Quit'
+    TabOrder = 1
+  end
+end

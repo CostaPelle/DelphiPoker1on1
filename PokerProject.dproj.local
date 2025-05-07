@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2025/04/30 15:50:14.000.104,=C:\Users\costa\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2025/04/30 15:51:36.000.015,C:\Users\costa\Documents\Embarcadero\Studio\Projects\Project1.dproj=C:\Users\costa\Documents\Embarcadero\Studio\Projects\PokerProject.dproj</Transaction>
+    <Transaction>2025/04/30 15:53:32.000.987,=C:\Users\costa\Documents\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
+    <Transaction>2025/04/30 16:01:42.000.716,=C:\Users\costa\Documents\Embarcadero\Studio\Projects\Unit3.pas</Transaction>
+    <Transaction>2025/04/30 16:02:07.000.376,C:\Users\costa\Documents\Embarcadero\Studio\Projects\Unit3.pas=C:\Users\costa\Documents\Embarcadero\Studio\Projects\CardTypes.pas</Transaction>
+    <Transaction>2025/05/05 11:15:30.000.662,=C:\Users\costa\Documents\Embarcadero\Studio\Projects\Unit4.pas</Transaction>
+    <Transaction>2025/05/05 11:15:49.000.669,C:\Users\costa\Documents\Embarcadero\Studio\Projects\Unit4.pas=C:\Users\costa\Documents\Embarcadero\Studio\Projects\PokerHandEvaluator.pas</Transaction>
+    <Transaction>2025/05/06 12:33:32.000.208,=C:\Users\costa\Documents\Embarcadero\Studio\Projects\Unit4.pas</Transaction>
+    <Transaction>2025/05/06 12:33:41.000.649,C:\Users\costa\Documents\Embarcadero\Studio\Projects\Unit4.pas=C:\Users\costa\Documents\Embarcadero\Studio\Projects\UCardPanel.pas</Transaction>
+    <Transaction>2025/05/07 11:31:19.000.149,=C:\Users\costa\Documents\Embarcadero\Studio\Projects\Signup.pas</Transaction>
+    <Transaction>2025/05/07 15:07:03.000.183,C:\Users\costa\Documents\Embarcadero\Studio\Projects\SignupForm.pas=C:\Users\costa\Documents\Embarcadero\Studio\Projects\Signup.pas</Transaction>
+    <Transaction>2025/05/07 15:07:03.000.183,C:\Users\costa\Documents\Embarcadero\Studio\Projects\SignupForm.dfm=C:\Users\costa\Documents\Embarcadero\Studio\Projects\Signup.dfm</Transaction>
+    <Transaction>2025/05/07 15:35:49.633,=C:\Users\costa\Documents\Embarcadero\Studio\Projects\Unit5.pas</Transaction>
+    <Transaction>2025/05/07 15:36:35.957,C:\Users\costa\Documents\Embarcadero\Studio\Projects\LoginForm.dfm=C:\Users\costa\Documents\Embarcadero\Studio\Projects\Unit5.dfm</Transaction>
+    <Transaction>2025/05/07 15:36:35.957,C:\Users\costa\Documents\Embarcadero\Studio\Projects\LoginForm.pas=C:\Users\costa\Documents\Embarcadero\Studio\Projects\Unit5.pas</Transaction>
+  </Transactions>
+</BorlandProject>
