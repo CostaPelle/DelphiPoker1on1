@@ -9,7 +9,6 @@ uses
 
 type
   TGameForm = class(TForm)
-    btnBack: TButton;
     lblCoins: TLabel;
     sliderBet: TTrackBar;
     lblBet: TLabel;
@@ -45,6 +44,7 @@ type
     Image3: TImage;
     Label2: TLabel;
     btnFold: TButton;
+    btnBack: TButton;
     procedure btnBackClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnBet1Click(Sender: TObject);
@@ -300,22 +300,29 @@ begin
     ShowMessage('All In is true ');
   end;
 
-  if PlayerHasCards = false and AllIn = false then
-  begin
-    DealPlayerCards;
-    Exit;
-  end;
-if MiddleHasCards = false and AllIn = false then
+if (PlayerHasCards = false) and (AllIn = false) then
+begin
+  DealPlayerCards;
+  Exit;
+end;
+if (MiddleHasCards = false) and (AllIn = false) then
 begin
   DealMiddleCards;
   Exit;
 end;
 
-if AllIn = true then
+if (AllIn = true) and (PlayerHasCards = false) then
 begin
  DealPlayerCards;
  DealMiddleCards;
 end;
+
+if (AllIn = true) and (PlayerHasCards = true) and (MiddleHasCards = false) then
+begin
+ DealMiddleCards;
+end;
+
+
 GetScore;
 
 if PlayerScore > BotScore then
@@ -355,6 +362,17 @@ ShuffleDeck(Deck);
 PlayerHasCards := false;
 MiddleHasCards := false;
 
+
+Card1.visible := false;
+Card2.visible := false;
+
+MiddleCards1.visible := false;
+MiddleCards2.visible := false;
+MiddleCards3.visible := false;
+
+BotCards1.visible := false;
+BotCards2.visible := false;
+
 lblCard1.Caption := ('');
 lblCard2.Caption := ('');
 
@@ -383,6 +401,18 @@ begin
 
   PlayerHasCards := false;
   MiddleHasCards := false;
+
+  Card1.visible := false;
+  Card2.visible := false;
+
+  MiddleCards1.visible := false;
+  MiddleCards2.visible := false;
+  MiddleCards3.visible := false;
+
+  BotCards1.visible := false;
+  BotCards2.visible := false;
+
+
 
   lblCard1.Caption := ('');
   lblCard2.Caption := ('');

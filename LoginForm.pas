@@ -48,7 +48,6 @@ var
 begin
   Username := edtUsername.Text;
   Password := edtPassword.Text;
-  //HashedPassword := HashPassword(Password); // Use the same hash function used in signup
 
   FDQuery1.SQL.Text :=
     'SELECT * FROM users WHERE username = :username AND password_hash = :password';

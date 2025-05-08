@@ -39,7 +39,7 @@ begin
   CountList := TList<Integer>.Create;
 
   try
-
+    // Gather values and suits
     for i := 0 to High(AllCards) do
     begin
       Values.Add(AllCards[i].Value);
@@ -55,7 +55,7 @@ begin
     SortedValues := Values.ToArray;
     TArray.Sort<Integer>(SortedValues);
 
-
+    // Check for flush
     IsFlush := True;
     for i := 1 to Suits.Count - 1 do
     begin
@@ -66,7 +66,7 @@ begin
       end;
     end;
 
-
+    // Check for straight
     IsStraight := True;
     for i := 0 to Length(SortedValues) - 2 do
     begin
@@ -88,7 +88,7 @@ begin
 
     IsRoyal := IsFlush and IsStraight and (SortedValues[0] = 10);
 
-
+    // Count occurrences
     for var Val in ValueCounts.Values do
       CountList.Add(Val);
     CountList.Sort;
@@ -101,7 +101,7 @@ else if IsFlush and IsStraight then
 else if CountList.Last = 4 then
 begin
   Result := 8;
-
+  // Four of a Kind - add 0.01 × value
   for var V in ValueCounts.Keys do
     if ValueCounts[V] = 4 then
     begin
@@ -131,7 +131,7 @@ else if IsStraight then
 else if CountList.Last = 3 then
 begin
   Result := 4;
-
+  // Three of a Kind - add 0.01 × value
   for var V in ValueCounts.Keys do
     if ValueCounts[V] = 3 then
     begin
@@ -142,7 +142,7 @@ end
 else if CountList.Count = 4 then
 begin
   Result := 2;
-
+  // One Pair - add 0.01 × pair value
   var PairValue: Integer := -1;
   for var V in ValueCounts.Keys do
     if ValueCounts[V] = 2 then
@@ -151,7 +151,7 @@ begin
       Result := Result + V * 0.01;
       Break;
     end;
-
+    // Add remaining kickers
   var Kickers: TList<Integer> := TList<Integer>.Create;
   try
     for var V in ValueCounts.Keys do
@@ -159,10 +159,10 @@ begin
         Kickers.Add(V);
 
     Kickers.Sort;
-    Kickers.Reverse;
+    Kickers.Reverse; // Highest kicker first
 
     for I := 0 to Kickers.Count - 1 do
-      Result := Result + Kickers[I] * Power(0.0001, I + 1);
+      Result := Result + Kickers[I] * Power(0.0001, I + 1); // e.g., 0.0001, 0.00001, ...
   finally
     Kickers.Free;
   end;
@@ -188,7 +188,7 @@ begin
       Result := Result + (Pairs[Pairs.Count - 2] * 0.001);
 
     if KickerValue <> -1 then
-      Result := Result + KickerValue * 0.0001;
+      Result := Result + KickerValue * 0.0001;         // kicker card
   finally
     Pairs.Free;
   end;
@@ -196,14 +196,14 @@ end
 else
 begin
   Result := 1;
-
+  // High card - add decreasing decimal weight for each card
   if Length(SortedValues) > 0 then
   begin
     var DecimalWeight := 0.001;
     for i := High(SortedValues) downto Low(SortedValues) do
     begin
       Result := Result + SortedValues[i] * DecimalWeight;
-      DecimalWeight := DecimalWeight / 10;
+      DecimalWeight := DecimalWeight / 10; // Reduce weight for next lower card
     end;
   end;
 end;

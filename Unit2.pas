@@ -96,7 +96,7 @@ var
 
 
 
-  // Helper function to convert Suit to string
+
   function SuitToString(Suit: TCardSuit): string;
   begin
     case Suit of
@@ -109,7 +109,7 @@ var
     end;
   end;
 
-  // Helper function to convert Rank to string
+
   function RankToString(Rank: TCardRank): string;
   begin
     case Rank of
@@ -132,26 +132,26 @@ var
   end;
 
   begin
-    // Create a circular region matching the size of Panel1
+
     Rgn := CreateEllipticRgn(0, 0, btnBet.Width, btnBet.Height);
-    // Apply the region to the panel
+
     SetWindowRgn(btnBet.Handle, Rgn, True);
     InitDeck(Deck);
     ShuffleDeck(Deck);
 
-      Coins := 100;  // Starting coins for the player
+      Coins := 100;
 
-    // Create and setup the TrackBar (Slider) dynamically if needed
+
     sliderBet.Min := 1;
     sliderBet.Max := Coins;
-    sliderBet.Position := 1;  // Starting bet is 1 coin
-    sliderBet.OnChange := sliderBetChange;  // Event to handle slider change
+    sliderBet.Position := 1;
+    sliderBet.OnChange := sliderBetChange;
 
-    // Loop to print all the cards to the debug log
+
     for I := 0 to Length(Deck) - 1 do
     begin
       CardStr := 'Card ' + IntToStr(I + 1) + ': ' + RankToString(Deck[I].Rank) + ' of ' + SuitToString(Deck[I].Suit);
-      OutputDebugString(PChar(CardStr)); // Prints the card to the debug log
+      OutputDebugString(PChar(CardStr));
     end;
   end;
 
@@ -162,7 +162,7 @@ begin
   // Get the selected bet amount from the slider
   BetAmount := sliderBet.Position;
 
-  // Validate the bet (must be less than or equal to coins available)
+
   if BetAmount <= 0 then
   begin
     ShowMessage('Bet amount must be greater than 0.');
@@ -181,12 +181,12 @@ begin
 
   PotLabel.Caption := 'Pot: ' + Pot.ToString;
 
-  // Update labels
+
   lblCoins.Caption := 'Coins: ' + Coins.ToString;
   lblBet.Caption := 'Bet: ' + BetAmount.ToString;
   sliderBet.Max := Coins;
 
-  // Optionally, print the Pot value
+
   ShowMessage('Bet placed! Coins: ' + Coins.ToString);
 
   if Coins < 1 then
@@ -262,12 +262,12 @@ procedure TGameForm.btnBetClick(Sender: TObject);
 var
   BetAmount: Integer;
 begin
-  // Get the selected bet amount from the slider
+
   BetAmount := sliderBet.Position;
 
   AllIn := false;
 
-  // Validate the bet (must be less than or equal to coins available)
+
   if BetAmount <= 0 then
   begin
     ShowMessage('Bet amount must be greater than 0.');
@@ -280,18 +280,18 @@ begin
     Exit;
   end;
 
-  // Deduct bet from the player's coins and add it to the pot
+
   Coins := Coins - BetAmount;
   Pot := Pot + BetAmount * 2;
 
   PotLabel.Caption := 'Pot: ' + Pot.ToString;
 
-  // Update labels
+
   lblCoins.Caption := 'Coins: ' + Coins.ToString;
   lblBet.Caption := 'Bet: ' + BetAmount.ToString;
   sliderBet.Max := Coins;
 
-    // Optionally, print the Pot value
+
   ShowMessage('Bet placed! Coins: ' + Coins.ToString);
 
   if Coins < 1 then
@@ -430,14 +430,14 @@ end;
 
 procedure TGameForm.sliderBetChange(Sender: TObject);
 begin
-  // Update the bet label whenever the slider value changes
+
   lblBet.Caption := 'Bet: ' + sliderBet.Position.ToString;
 end;
 
 
 
 
-//Give Cardss graphic
+// Give Cardss graphic
 
 
 function TGameForm.GetCardDisplay(Card: TCard): string;
@@ -451,7 +451,7 @@ begin
   Result := RankNames[Card.Rank] + ' of ' + SuitNames[Card.Suit];
 end;
 
-//Give cards to player
+// Give cards to player
 
 
 procedure TGameForm.DealPlayerCards;
@@ -485,7 +485,7 @@ begin
 
   PlayerHasCards := true;
 
-  // Example with labels:
+
   lblCard1.Caption := GetCardDisplay(PlayerCard1);
   lblCard2.Caption := GetCardDisplay(PlayerCard2);
 
@@ -495,7 +495,7 @@ end;
 
 
 
-//Put Cards in the middle
+
 procedure TGameForm.DealMiddleCards;
 begin
   if Length(Deck) < 2 then
@@ -520,13 +520,13 @@ begin
 
   Delete(Deck, 0, 3);
 
-    // Set the CommunityCards array
+  // Set the CommunityCards array
   SetLength(CommunityCards, 3);
   CommunityCards[0] := MiddleCard1;
   CommunityCards[1] := MiddleCard2;
   CommunityCards[2] := MiddleCard3;
 
-  // Example with labels:
+
   lblCard3.Caption := GetCardDisplay(MiddleCard1);
   lblCard4.Caption := GetCardDisplay(MiddleCard2);
   lblCard5.Caption := GetCardDisplay(MiddleCard3);

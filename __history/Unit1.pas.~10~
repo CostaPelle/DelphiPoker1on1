@@ -31,7 +31,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Unit2;
+  Unit2; // Add this at the top
 
 procedure TMainMenuForm.btnPlayClick(Sender: TObject);
 begin

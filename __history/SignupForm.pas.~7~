@@ -45,7 +45,7 @@ uses Unit1;
 
 function HashPassword(const Password: string): string;
 begin
-  Result := THashSHA2.GetHashString(Password);
+  Result := THashSHA2.GetHashString(Password); // SHA-256 hash
 end;
 
 procedure TForm4.btnBackClick(Sender: TObject);
@@ -59,21 +59,23 @@ begin
 var
   Username, Password: string;
 begin
-
+  // Get the values from the text fields
   Username := edtUsername.Text;
   Password := edtPassword.Text;
 
+  // Check if both fields are filled in
   if (Username = '') or (Password = '') then
   begin
     ShowMessage('Please enter both username and password.');
     Exit;
   end;
 
+  // Prepare and execute the SQL query
   try
     FDQuery1.SQL.Text := 'INSERT INTO users (username, password_hash) VALUES (:username, :password)';
     FDQuery1.Params.ParamByName('username').AsString := Username;
-    FDQuery1.Params.ParamByName('password').AsString := Password;
-    FDQuery1.ExecSQL;
+    FDQuery1.Params.ParamByName('password').AsString := Password; // For simplicity, you might want to hash the password
+    FDQuery1.ExecSQL; // Execute the SQL query
 
     ShowMessage('User added successfully!');
   except
